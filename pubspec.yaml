@@ -16,6 +16,7 @@ dependencies:
   scoped_model: ^1.1.0
   flutter_staggered_animations: "^0.1.1"
   http: ^0.12.2
+  fluttertoast: ^8.0.7
   flutter_spinkit: "^4.1.0"
   
 

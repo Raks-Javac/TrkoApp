@@ -5,7 +5,7 @@ import 'package:trko/src/models/user.dart';
 import 'package:trko/src/scopedModel/auth.dart';
 import 'package:trko/src/screens/trkoHome.dart';
 import 'package:trko/src/screens/trkoRegister.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:trko/src/utils/closeNode.dart';
 import 'package:trko/src/widgets/authProgress.dart';
 import 'package:trko/src/widgets/logoWidth.dart';
@@ -24,6 +24,8 @@ class _TrkoSignInState extends State<TrkoSignIn> {
   final _formKey = GlobalKey<FormState>();
 
   User user;
+  String email;
+  String password;
 
   final FocusNode nodeFirst = FocusNode();
 
@@ -75,28 +77,36 @@ class _TrkoSignInState extends State<TrkoSignIn> {
                         height: 3,
                       ),
                       TextFieldWidget(
-                        validator: (String val) =>
-                            (val.isEmpty || val.length < 8)
-                                ? "Enter a valid email"
-                                : null,
-                        obscureText: false,
-                        node: nodeFirst,
-                        textFieldText: "Email",
-                        textField: (String val) => user.email = val,
-                      ),
+                          validator: (String val) =>
+                              (val.isEmpty || val.length < 8)
+                                  ? "Enter a valid email"
+                                  : null,
+                          obscureText: false,
+                          node: nodeFirst,
+                          textFieldText: "Email",
+                          textField: (String val) {
+                            user.email = val;
+                            setState(() {
+                              email = val;
+                            });
+                          }),
                       SizedBox(
                         height: 20,
                       ),
                       TextFieldWidget(
-                        validator: (String val) =>
-                            (val.isEmpty || val.length < 8)
-                                ? "Password must be 8+ character"
-                                : null,
-                        obscureText: true,
-                        node: nodeSecond,
-                        textFieldText: "Password",
-                        textField: (val) => user.password = val,
-                      ),
+                          validator: (String val) =>
+                              (val.isEmpty || val.length < 8)
+                                  ? "Password must be 8+ character"
+                                  : null,
+                          obscureText: true,
+                          node: nodeSecond,
+                          textFieldText: "Password",
+                          textField: (val) {
+                            user.password = val;
+                            setState(() {
+                              password = val;
+                            });
+                          }),
                       SizedBox(
                         height: 20,
                       ),
@@ -116,25 +126,65 @@ class _TrkoSignInState extends State<TrkoSignIn> {
                                 .login(user.email, user.password)
                                 .then((value) {
                               if (value != null) {
-                                setState(() {
-                                  isApiCallProcess = false;
-                                });
-                                Navigator.of(context).pushReplacement(
-                                    PreviewSlideRoute(
-                                        preview: TrkoHome(), duration: 200));
+                                if (value.email == user.email ||
+                                    value.password == user.password) {
+                                  print(user.email);
+                                  print(user.password);
+                                  setState(() {
+                                    isApiCallProcess = false;
+                                  });
+                                  Navigator.of(context).pushReplacement(
+                                      PreviewSlideRoute(
+                                          preview: TrkoHome(), duration: 200));
+
+                                  Fluttertoast.showToast(
+                                    msg: "Logged In",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.green[300],
+                                    textColor: Colors.white,
+                                    fontSize: 16.0,
+                                  );
+                                } else {
+                                  setState(() {
+                                    isApiCallProcess = false;
+                                  });
+                                  Fluttertoast.showToast(
+                                    msg: "Invalid credentials",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0,
+                                  );
+                                }
                               } else if (value == null) {
                                 setState(() {
                                   isApiCallProcess = false;
                                 });
-                                final snackBar = SnackBar(
-                                    content: Text("Login credential error"));
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+
+                                Fluttertoast.showToast(
+                                  msg:
+                                      "Oops!  error, Check your internet connection",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0,
+                                );
                               } else {
-                                final snackBar =
-                                    SnackBar(content: Text("Error occured"));
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                                Fluttertoast.showToast(
+                                  msg: "Error occured try again Later..",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0,
+                                );
                               }
                             });
                           } else {}
