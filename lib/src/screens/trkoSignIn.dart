@@ -24,8 +24,6 @@ class _TrkoSignInState extends State<TrkoSignIn> {
   final _formKey = GlobalKey<FormState>();
 
   User user;
-  String email;
-  String password;
 
   final FocusNode nodeFirst = FocusNode();
 
@@ -41,7 +39,6 @@ class _TrkoSignInState extends State<TrkoSignIn> {
 
   @override
   Widget build(BuildContext context) {
-    // final _auth = ScopedModel.of<Auth>(context, rebuildOnChange: true);
     return ScopedModel<Auth>(
       model: Auth(),
       child: ProgressHUD(
@@ -77,43 +74,35 @@ class _TrkoSignInState extends State<TrkoSignIn> {
                         height: 3,
                       ),
                       TextFieldWidget(
-                          validator: (String val) =>
-                              (val.isEmpty || val.length < 8)
-                                  ? "Enter a valid email"
-                                  : null,
-                          obscureText: false,
-                          node: nodeFirst,
-                          textFieldText: "Email",
-                          textField: (String val) {
-                            user.email = val;
-                            setState(() {
-                              email = val;
-                            });
-                          }),
+                        validator: (String val) =>
+                            (val.isEmpty || val.length < 8)
+                                ? "Enter a valid email"
+                                : null,
+                        obscureText: false,
+                        node: nodeFirst,
+                        textFieldText: "Email",
+                        textField: (String val) => user.email = val,
+                      ),
                       SizedBox(
                         height: 20,
                       ),
                       TextFieldWidget(
-                          validator: (String val) =>
-                              (val.isEmpty || val.length < 8)
-                                  ? "Password must be 8+ character"
-                                  : null,
-                          obscureText: true,
-                          node: nodeSecond,
-                          textFieldText: "Password",
-                          textField: (val) {
-                            user.password = val;
-                            setState(() {
-                              password = val;
-                            });
-                          }),
+                        validator: (String val) =>
+                            (val.isEmpty || val.length < 8)
+                                ? "Password must be 8+ character"
+                                : null,
+                        obscureText: true,
+                        node: nodeSecond,
+                        textFieldText: "Password",
+                        textField: (val) => user.password = val,
+                      ),
                       SizedBox(
                         height: 20,
                       ),
                       MaterialButton(
                         onPressed: () async {
                           if (_formKey.currentState.validate()) {
-                            print(user.toJson());
+                            // print(user.toJson());
 
                             setState(() {
                               isApiCallProcess = true;
@@ -121,28 +110,29 @@ class _TrkoSignInState extends State<TrkoSignIn> {
 
                             Auth apiService = new Auth();
 
-                            print(user.toJson());
+                            // print(user.toJson());
                             apiService
                                 .login(user.email, user.password)
                                 .then((value) {
+                              print(value.password);
                               if (value != null) {
-                                if (value.email == user.email ||
+                                if (value.email == user.email &&
                                     value.password == user.password) {
-                                  print(user.email);
-                                  print(user.password);
                                   setState(() {
                                     isApiCallProcess = false;
                                   });
                                   Navigator.of(context).pushReplacement(
-                                      PreviewSlideRoute(
-                                          preview: TrkoHome(), duration: 200));
-
+                                    PreviewSlideRoute(
+                                      preview: TrkoHome(),
+                                      duration: 200,
+                                    ),
+                                  );
                                   Fluttertoast.showToast(
                                     msg: "Logged In",
                                     toastLength: Toast.LENGTH_SHORT,
                                     gravity: ToastGravity.BOTTOM,
                                     timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.green[300],
+                                    backgroundColor: Colors.black,
                                     textColor: Colors.white,
                                     fontSize: 16.0,
                                   );
